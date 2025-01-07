@@ -1,0 +1,82 @@
+<Gauge>:
+    #Scatter:
+    #    id: carre
+    #    size: self.parent.size_gauge, self.parent.size_gauge
+    #    do_rotation: False
+    #    do_scale: False
+    #    do_translation: False
+    #    Image:
+    #        source: root.file_square
+    #        size: self.parent.size
+    
+    Scatter:
+        id: marker
+        size: self.parent.size_gauge, self.parent.size_gauge
+        do_rotation: False
+        do_scale: False
+        do_translation: False
+        canvas:
+        
+            Color:
+                rgba: root.marker_color
+            Ellipse:
+                pos: self.pos
+                size: self.size[0], self.size[1]
+                angle_start: root.marker_startangle 
+                angle_end: root._angle + root.marker_ahead if root._angle > root.marker_startangle else root.marker_startangle
+                source: root.file_square
+
+            #StencilPush
+            #    Ellipse:
+            #        pos: self.pos
+            #        size: self.size
+            #        angle_start: root.marker_startangle
+            #        angle_end: root._angle + root.marker_ahead if root._angle > root.marker_startangle else root.marker_startangle
+            #    StencilUse
+            #    Color:
+            #        rgba: 1, 1, 1, 1  # Couleur blanche pour l'image
+            #    Rectangle:
+            #        pos: self.pos
+            #        size: self.size
+            #        source: root.file_square
+            #    StencilUnUse
+            #    StencilPop
+
+    Scatter:
+        id: gauge
+        size: self.parent.size_gauge, self.parent.size_gauge
+        do_rotation: False
+        do_scale: False
+        do_translation: False
+        Image:
+            source: root.file_gauge
+            size: self.parent.size
+
+
+    
+    Scatter:
+        id: needle
+        size: self.parent.size_gauge, self.parent.size_gauge
+        do_rotation: False
+        do_scale: False
+        do_translation: False
+        rotation : 90
+        Image:
+            source: root.file_needle
+            size: self.parent.size
+
+    Label:
+        id: label
+        font_size: root.size_text
+        markup: True
+        center_x: gauge.center_x
+        center_y: gauge.center_y + (root.size_gauge / 4)
+
+    ProgressBar:
+        id: progress
+        max: 100
+        height: 20
+        value: root.value
+        x: gauge.x
+        y: gauge.y + (root.size_gauge / 4)
+        width: root.size_gauge
