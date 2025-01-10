@@ -1,46 +1,48 @@
 <Gauge>:
-    #Scatter:
-    #    id: carre
-    #    size: self.parent.size_gauge, self.parent.size_gauge
-    #    do_rotation: False
-    #    do_scale: False
-    #    do_translation: False
-    #    Image:
-    #        source: root.file_square
-    #        size: self.parent.size
-    
+    #canvas.before:
+    #    Color:
+    #        rgba: 1, 1, 1, 1
+    #    Rectangle:
+    #        pos: self.pos
+    #        size: self.size
+    #
+    size_hint: None, None
+    size: root.size_gauge, root.size_gauge
+    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
     Scatter:
         id: marker
         size: self.parent.size_gauge, self.parent.size_gauge
         do_rotation: False
         do_scale: False
         do_translation: False
+
         canvas:
-        
+
+            # Utilisation de StencilPush, StencilUse et StencilUnUse pour masquer une partie de l'image
+            # On commence par définir la zone de masquage entre StencilPush et StencilUse
+            # Ici on dessine un cercle non rempli qui va suivre le mouvement de l'aiguille
+            # Entre StencilUse et StencilUnUse on définit l'image qui va être masquée donc ici le fond qui représente la couleur de la jauge en arrière plan 
+
+            StencilPush
+            #Color:
+            #    rgba: 1, 1, 1, 1
+            Line:
+                circle:
+                    (self.center_x, self.center_y, self.parent.size_gauge / 2  - (17 * self.parent.size_gauge)/256 , root.marker_startangle,root._angle  if root._angle > root.marker_startangle else root.marker_startangle )
+                width: (10 * self.parent.size_gauge)/256
+                cap: 'none'
+            StencilUse
             Color:
-                rgba: root.marker_color
-            Ellipse:
+                rgba: 1, 1, 1, 1
+            Rectangle:
                 pos: self.pos
                 size: self.size[0], self.size[1]
-                angle_start: root.marker_startangle 
-                angle_end: root._angle + root.marker_ahead if root._angle > root.marker_startangle else root.marker_startangle
-                source: root.file_square
+                source: root.file_couleur1
+                
+            StencilUnUse
+            StencilPop
 
-            #StencilPush
-            #    Ellipse:
-            #        pos: self.pos
-            #        size: self.size
-            #        angle_start: root.marker_startangle
-            #        angle_end: root._angle + root.marker_ahead if root._angle > root.marker_startangle else root.marker_startangle
-            #    StencilUse
-            #    Color:
-            #        rgba: 1, 1, 1, 1  # Couleur blanche pour l'image
-            #    Rectangle:
-            #        pos: self.pos
-            #        size: self.size
-            #        source: root.file_square
-            #    StencilUnUse
-            #    StencilPop
+    # Importation de l'image de la jauge
 
     Scatter:
         id: gauge
@@ -51,8 +53,8 @@
         Image:
             source: root.file_gauge
             size: self.parent.size
-
-
+            allow_stretch: True
+    # Importation de l'image de l'aiguille
     
     Scatter:
         id: needle
@@ -64,19 +66,48 @@
         Image:
             source: root.file_needle
             size: self.parent.size
+            allow_stretch: True
 
     Label:
         id: label
-        font_size: root.size_text
+        font_size: (25 * self.parent.size_gauge)/256
         markup: True
         center_x: gauge.center_x
         center_y: gauge.center_y + (root.size_gauge / 4)
 
-    ProgressBar:
-        id: progress
-        max: 100
-        height: 20
-        value: root.value
-        x: gauge.x
-        y: gauge.y + (root.size_gauge / 4)
-        width: root.size_gauge
+
+    
+    #Segment:
+    #    id: segment1
+    #    scale: 0.3
+    #    value: str(root.value)
+    #    color: '2fc827'
+    #    size_hint: None, None
+    #    size: root.size_gauge / 2, root.size_gauge / 2
+    #    #pos_hint: None, None
+    #    #pos : 20, 20
+    #    center_x: gauge.center_x
+    #    center_y: gauge.center_y + (root.size_gauge / 4)
+
+    BoxLayout:
+        id: segments_box
+        orientation: 'horizontal'
+        size_hint: None, None
+        size: 120, 30
+        center_x: gauge.center_x #+ 70
+        center_y: gauge.center_y + (root.size_gauge / 4)  - 100
+        spacing: 0
+        padding: [0, 0, 0, 0]
+
+
+
+    BoxLayout:
+        spacing: 20
+        Label:
+            text: 'oui'
+            
+        Label:
+            text: 'non'
+
+        
+            
