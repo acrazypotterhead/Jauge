@@ -5,6 +5,8 @@ from kivy.properties import NumericProperty, StringProperty, BoundedNumericPrope
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.graphics import Color, Ellipse, Mesh, Scale
 from kivy.utils import get_color_from_hex
+from kivy.config import Config
+Config.set('graphics', 'multisamples', '2')  # Vous pouvez essayer avec 2, 4, 8, etc.
 
 class Gauge(Widget):
 
@@ -40,7 +42,7 @@ class Gauge(Widget):
     radius = NumericProperty()
     width = NumericProperty()   
     number_digits = NumericProperty()
-    global_scale = NumericProperty(0.3)
+    segment_scale = NumericProperty(0.4)
     
     
     def __init__(self, **kwargs):
@@ -81,13 +83,13 @@ class Gauge(Widget):
             self.ids.segments_box.clear_widgets()
 
             for digit in integer_digits:
-                segment = Segment(scale=self.global_scale, value=str(digit), color='2fc827')
+                segment = Segment(scale=self.segment_scale, value=str(digit), color='2fc827')
                 self.ids.segments_box.add_widget(segment)
-            segment = Segment(scale=self.global_scale, value='.', color='2fc827')
+            segment = Segment(scale=self.segment_scale, value='.', color='2fc827')
             self.ids.segments_box.add_widget(segment)
 
             for digit in decimal_digits:
-                segment = Segment(scale=self.global_scale, value=str(digit), color='2fc827')
+                segment = Segment(scale=self.segment_scale, value=str(digit), color='2fc827')
                 self.ids.segments_box.add_widget(segment)
 
         else:
@@ -96,7 +98,7 @@ class Gauge(Widget):
             self.ids.segments_box.clear_widgets()
 
             for digit in digits:
-                segment = Segment(scale=self.global_scale, value=str(digit), color='2fc827')
+                segment = Segment(scale=self.segment_scale, value=str(digit), color='2fc827')
                 self.ids.segments_box.add_widget(segment)
 
 class Segment(RelativeLayout):

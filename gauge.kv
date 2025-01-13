@@ -43,7 +43,7 @@
             StencilPop
 
     # Importation de l'image de la jauge
-
+ 
     Scatter:
         id: gauge
         size: self.parent.size_gauge, self.parent.size_gauge
@@ -93,21 +93,8 @@
         id: segments_box
         orientation: 'horizontal'
         size_hint: None, None
-        size: 120, 30
+        size:  (root.segment_scale * 120)/0.2, (root.segment_scale * 30)/0.2
         center_x: gauge.center_x #+ 70
         center_y: gauge.center_y + (root.size_gauge / 4)  - 100
         spacing: 0
         padding: [0, 0, 0, 0]
-
-
-
-    BoxLayout:
-        spacing: 20
-        Label:
-            text: 'oui'
-            
-        Label:
-            text: 'non'
-
-        
-            

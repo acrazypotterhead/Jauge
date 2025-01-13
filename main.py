@@ -5,7 +5,8 @@ from kivy.uix.slider import Slider
 from components import Gauge, Segment  # Importation de la classe Gauge depuis gauge.py
 from kivy.properties import NumericProperty
 from kivy.lang import Builder
-
+from kivy.config import Config
+Config.set('graphics', 'multisamples', '2')  # Vous pouvez essayer avec 2, 4, 8, etc.
 
 Builder.load_file('gauge.kv')
 
