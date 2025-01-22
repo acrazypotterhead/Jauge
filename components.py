@@ -5,65 +5,80 @@ from kivy.properties import NumericProperty, StringProperty, BoundedNumericPrope
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.graphics import Color, Ellipse, Mesh, Scale
 from kivy.utils import get_color_from_hex
-from kivy.config import Config
-Config.set('graphics', 'multisamples', '2')  # Vous pouvez essayer avec 2, 4, 8, etc.
+import math
+from kivy.uix.boxlayout import BoxLayout
 
 class Gauge(Widget):
 
-    _start_angle = NumericProperty()
-    _end_angle = NumericProperty()
-    _min_data = NumericProperty()
-    _max_data = NumericProperty()
+    #Valeur max de la jauge
+    min_slidder = NumericProperty(200)
+    max_slidder = NumericProperty(500)
+    variable = NumericProperty()
+    unit = NumericProperty(3) 
+
     
-    _angle          = NumericProperty(-90)            # Internal angle calculated from value.
+    _angle          = NumericProperty(-180)  
 
+    marker_startangle = NumericProperty()
+    needle_start_angle = NumericProperty()
 
-    unit = NumericProperty(1.8)  # 1.8 fait que l'aiguille fasse un arc de cercle de 180°
-    value = BoundedNumericProperty(0, min=0, max=100, errorvalue=0)
+ 
+    size_center = NumericProperty(194)
+    
+    value = BoundedNumericProperty(0, min=0, max=500, errorvalue=0)
     path = __file__
 
-    file_gauge = StringProperty("images/cercle_blanc.png")
+    # Importation images
+    file_gauge = StringProperty("images/cadran3.jpg")
     file_needle = StringProperty("images/aiguille violette.png")
-    file_square = StringProperty("images/carré.png")
     file_marker = StringProperty("images/marker.png")
-    file_couleur1 = StringProperty("images/couleur1.jpg")
+    file_background_color = StringProperty("images/couleur1.jpg")
+    file_value_marker = StringProperty("images/trait_rouge.png")
 
     size_gauge = NumericProperty()
     size_text = NumericProperty()
     
     marker_color = ListProperty([1, 1, 1, 1])
-    marker_size = NumericProperty(0.10)
-    marker_angle = NumericProperty(90)
-    needle_angle = NumericProperty(0)
-    marker_startangle = NumericProperty(-90)
-    #marker_ahead = NumericProperty(0)
+
+    
+    max_value_encountered = NumericProperty(0)
     show_marker = BooleanProperty(True)
     
-    radius = NumericProperty()
-    width = NumericProperty()   
+    segment_color = StringProperty('2fc827')
+    
     number_digits = NumericProperty()
-    segment_scale = NumericProperty(0.4)
+    segment_scale = NumericProperty(0.3)
+    
     
     
     def __init__(self, **kwargs):
         super(Gauge, self).__init__(**kwargs)
         self.bind(value=self._turn)
-        self.bind(show_marker=self._show_marker)
-
-    def _show_marker(self, *args, flag):
-        if flag:
-            self.marker_color[3] = 1
-        else:
-            self.marker_color[3] = 0
+        self.marker_startangle = -self.unit * 100 / 2  
+        self.needle_start_angle = self.unit * 100 / 2
+   
 
     def _turn(self, *args):
-        self.ids.needle.rotation = (50 * self.unit) - (self.value * self.unit) #50 fait que l'aiguille n'aille pas dans les negatifs 
-        self.ids.label.text = f"[b]{self.value:.0f}[/b]"
-        self._angle = (self.value * self.unit)-50 * self.unit
+        self.ids.needle.rotation = (50 * self.unit) - ((self.value - self.min_slidder)*(100/(self.max_slidder-self.min_slidder)) * self.unit) #50 fait que l'aiguille n'aille pas dans les negatifs 
+        self._angle = ((self.value - self.min_slidder)*(100/(self.max_slidder-self.min_slidder)) * self.unit)-50 * self.unit
+
         
-        #self.ids.segment1.value = str(int(self.value))
-        #self.ids.segment2.value = str(int(self.value))
-        #self.ids.segment3.value = str(int(self.value))
+        if self.value > self.max_value_encountered:
+            self.max_value_encountered = self.value
+
+        # Mettre à jour la rotation du value_marker
+        self.ids.value_marker.rotation = (50 * self.unit) - ((self.max_value_encountered - self.min_slidder) * (100 / (self.max_slidder - self.min_slidder)) * self.unit)
+
+
+    def reset_max_value(self):
+        self.max_value_encountered = 0
+        self.ids.value_marker.rotation = self.needle_start_angle
+
+    def is_max(self, value):
+        max = self.value
+        if value > max:
+            return True
+        
 
     def contains_value(self, string, value):
         return value in string
@@ -83,15 +98,17 @@ class Gauge(Widget):
             self.ids.segments_box.clear_widgets()
 
             for digit in integer_digits:
-                segment = Segment(scale=self.segment_scale, value=str(digit), color='2fc827')
+                segment = Segment(scale=self.segment_scale, value=str(digit), color=self.segment_color)
                 self.ids.segments_box.add_widget(segment)
-            segment = Segment(scale=self.segment_scale, value='.', color='2fc827')
+               
+            segment = Segment(scale=self.segment_scale, value='.', color=self.segment_color)
+
             self.ids.segments_box.add_widget(segment)
 
             for digit in decimal_digits:
-                segment = Segment(scale=self.segment_scale, value=str(digit), color='2fc827')
+                segment = Segment(scale=self.segment_scale, value=str(digit), color=self.segment_color)
                 self.ids.segments_box.add_widget(segment)
-
+                
         else:
 
             digits = self.split_number_integer(number)
@@ -147,63 +164,83 @@ class Segment(RelativeLayout):
         #   |       |
         #     _ 7 _
 
-        
         seg_1 = [
-                20, 215, 0, 0,
-                35, 230, 0, 0,
-                95, 230, 0, 0,
-                110, 215, 0, 0,
-                95, 200, 0, 0,
-                35, 200, 0, 0,
-                ]
+            8, 222, 0, 0,
+            7, 224, 0, 0,
+            10, 225, 0, 0,
+            120, 225, 0, 0,
+            123, 224, 0, 0,
+            122, 222, 0, 0,
+            100, 200,0 ,0,
+            30, 200, 0, 0,
+            
+            ]
         seg_2 = [
-                15, 210, 0, 0,
-                30, 195, 0, 0,
-                30, 135, 0, 0,
-                15, 120, 0, 0,
-                0, 135, 0, 0,
-                0, 195, 0, 0,
-                ]
+            0, 220, 0, 0,
+            1, 223, 0, 0,
+            3, 222, 0, 0,
+            30, 195, 0, 0,
+            30, 132, 0, 0,
+            3, 119, 0, 0,
+            1, 117, 0, 0,
+            0, 120, 0, 0,
+            ]
         seg_3 = [
-                115, 210, 0, 0,
-                130, 195, 0, 0,
-                130, 135, 0, 0,
-                115, 120, 0, 0,
-                100, 135, 0, 0,
-                100, 195, 0, 0,
-                ]
+            100, 195, 0, 0,
+            127, 222, 0, 0,
+            129, 223, 0, 0,
+            130, 222, 0, 0,
+            130, 105, 0, 0,
+            129, 102, 0, 0,
+            127, 103, 0, 0,
+            100, 130, 0, 0,
+            ]
         seg_4 = [
-                20, 115, 0, 0,
-                35, 130, 0, 0,
-                95, 130, 0, 0,
-                110, 115, 0, 0,
-                95, 100, 0, 0,
-                35, 100, 0, 0,
-                ]
+            33, 130, 0, 0,
+            97, 130, 0, 0,
+            97, 100, 0, 0,
+            33, 100, 0, 0,
+            4, 115, 0, 0,
+     
+            ]
         seg_5 = [
-                15, 110, 0, 0,
-                30, 95, 0, 0,
-                30, 35, 0, 0,
-                15, 20, 0, 0,
-                0, 35, 0, 0,
-                0, 95, 0, 0,
-                ]
+            0, 110, 0, 0,         #7 coordonnées
+            1, 113, 0, 0,
+            3, 112, 0, 0,
+            30, 97, 0, 0,
+            30, 48, 0, 0,
+            0, 48, 0, 0,
+
+            ]
         seg_6 = [
-                115, 110, 0, 0,
-                130, 95, 0, 0,
-                130, 35, 0, 0,
-                115, 20, 0, 0,
-                100, 35, 0, 0,
-                100, 95, 0, 0,
-                ]
+            130, 95, 0, 0,
+            130, 10, 0, 0,
+            129, 9, 0, 0,
+            128, 8, 0, 0,
+            127, 7, 0, 0,
+            100, 35, 0, 0,
+            100, 120, 0, 0,
+            101, 123, 0, 0,
+   
+            ]
         seg_7 = [
-                20, 15, 0, 0,
-                35, 30, 0, 0,
-                95, 30, 0, 0,
-                110, 15, 0, 0,
-                95, 0, 0, 0,
-                35, 0, 0, 0,
-                ]
+            
+            10, 5, 0, 0,
+            9, 6, 0, 0,
+            7, 5, 0, 0,
+            5, 6, 0, 0,
+            4, 8, 0, 0,
+            3, 9, 0, 0,
+            2, 10, 0, 0,
+            1, 12, 0, 0,
+            0, 15, 0, 0,
+            0, 45, 0, 0,        #10 coordonnées
+            30, 45, 0, 0,
+            30, 35, 0, 0,
+            95, 35, 0, 0,
+            125, 5, 0, 0,
+            ]
+
         seg_point = [	
                 9, 35, 0, 0,
                 26, 35, 0, 0,
@@ -276,23 +313,27 @@ class Segment(RelativeLayout):
         '''
         for key, val in self.type_dic.items():
             if self.value == key:
-                if key == ".":
-                    self.indice = range(0, 8)
-                    for segment in val:
-                        Mesh(
-                            vertices=segment, 
-                            indices=self.indice, 
-                            mode=self.xmode
-                            )
-                else:
-                    for segment in val:
-                        
-                        Mesh(
-                            vertices=segment, 
-                            indices=self.indice, 
-                            mode=self.xmode
-                            )
+                for segment in val:
+                    self.indice = range(0, len(segment)//4)
+                    Mesh(
+                        vertices=segment, 
+                        indices=self.indice, 
+                        mode=self.xmode
+                        )
              
+             
+class Main(BoxLayout):
+    pass
 
+class Valeur_bouton(BoxLayout):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        print("Valeur_bouton instancié :", self)
     # Avoid if session
-    
+
+class Gauge_barre(Widget):
+    value = NumericProperty()
+    file_background_color = StringProperty("images/couleur1.jpg")
+    file_needle = StringProperty("images/needle_fine.png")
+    max_slidder = NumericProperty(700)
+    min_slidder = NumericProperty(200)

@@ -1,49 +1,71 @@
-<Gauge>:
-    #canvas.before:
-    #    Color:
-    #        rgba: 1, 1, 1, 1
-    #    Rectangle:
-    #        pos: self.pos
-    #        size: self.size
-    #
+<Main>:
+    TextInput:
+        id: name_input
+        multiline: False
+        hint_text: "Name"
+        size_hint: None,None
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        size: 100, 50
+        pos: 100, 100
+
+<Valeur_bouton>:
+    id: test_widget
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: 'Widget unique'
+
+
+
+<Gauge_barre>:
     size_hint: None, None
-    size: root.size_gauge, root.size_gauge
-    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-    Scatter:
-        id: marker
-        size: self.parent.size_gauge, self.parent.size_gauge
-        do_rotation: False
-        do_scale: False
-        do_translation: False
 
-        canvas:
 
-            # Utilisation de StencilPush, StencilUse et StencilUnUse pour masquer une partie de l'image
-            # On commence par définir la zone de masquage entre StencilPush et StencilUse
-            # Ici on dessine un cercle non rempli qui va suivre le mouvement de l'aiguille
-            # Entre StencilUse et StencilUnUse on définit l'image qui va être masquée donc ici le fond qui représente la couleur de la jauge en arrière plan 
-
-            StencilPush
-            #Color:
-            #    rgba: 1, 1, 1, 1
-            Line:
-                circle:
-                    (self.center_x, self.center_y, self.parent.size_gauge / 2  - (17 * self.parent.size_gauge)/256 , root.marker_startangle,root._angle  if root._angle > root.marker_startangle else root.marker_startangle )
-                width: (10 * self.parent.size_gauge)/256
-                cap: 'none'
-            StencilUse
+    Widget:
+        id: gauge_barre
+        canvas: 
             Color:
                 rgba: 1, 1, 1, 1
-            Rectangle:
-                pos: self.pos
-                size: self.size[0], self.size[1]
-                source: root.file_couleur1
-                
-            StencilUnUse
-            StencilPop
+            Line:
+                rectangle: 100, 100, 600, 100
+                width: 3
+        
+    Widget:
+        id: marker_barre
+        canvas.before:
+            Color:
+                rgba: 1, 1, 1, 0.5
+            Rectangle: 
+                pos: 100, 100
+                size : (root.value-root.min_slidder)* (600/(root.max_slidder - root.min_slidder)), 100
+                source: root.file_background_color
 
-    # Importation de l'image de la jauge
- 
+    Image:
+        id: needle_barre
+        source: root.file_needle
+        size: 100, 100
+        pos:  50 + (root.value-root.min_slidder)* (600/(root.max_slidder - root.min_slidder)), 100 
+        allow_stretch: True
+
+    Label:
+        id: label_barre
+        text: str(root.value)
+        pos: 400, 200
+        size: 100, 100
+        font_size: 30
+        color: 1, 1, 1, 1
+        
+        
+
+
+<Gauge>:
+    
+    size_hint: None, None
+    size: root.size_gauge, root.size_gauge
+    pos: 100, 500
+
+    variable: root.size_gauge/600
+
     Scatter:
         id: gauge
         size: self.parent.size_gauge, self.parent.size_gauge
@@ -54,6 +76,32 @@
             source: root.file_gauge
             size: self.parent.size
             allow_stretch: True
+    Scatter:
+        id: marker
+        size: self.parent.size_gauge, self.parent.size_gauge
+        do_rotation: False
+        do_scale: False
+        do_translation: False
+        canvas.before:
+            Color:
+                rgba: 1, 1, 1, 0.5
+            Ellipse: 
+                pos:(self.center_x - (self.size[0] - (110* root.variable)) / 2, self.center_y - (self.size[1] - (110*root.variable)) / 2 - (15*root.variable))
+                size: self.size[0]-(110*root.variable), self.size[1]-(110*root.variable)
+                angle_start: root.marker_startangle 
+                angle_end: root._angle if root._angle > root.marker_startangle else root.marker_startangle
+                source: root.file_background_color
+        canvas: 
+            Color:
+                rgba: 1, 1, 1, 1 
+            Ellipse: 
+                pos: (self.center_x - (self.size[0] - (root.size_center*root.variable)) / 2  , self.center_y - (self.size[1] - (root.size_center*root.variable)) / 2  - (15*root.variable))
+                size: self.size[0]-((root.size_center*root.variable)), self.size[1]-((root.size_center*root.variable))
+
+
+
+
+    
     # Importation de l'image de l'aiguille
     
     Scatter:
@@ -62,39 +110,50 @@
         do_rotation: False
         do_scale: False
         do_translation: False
-        rotation : 90
+        rotation : root.needle_start_angle
         Image:
             source: root.file_needle
             size: self.parent.size
             allow_stretch: True
 
-    Label:
-        id: label
-        font_size: (25 * self.parent.size_gauge)/256
-        markup: True
-        center_x: gauge.center_x
-        center_y: gauge.center_y + (root.size_gauge / 4)
-
-
-    
-    #Segment:
-    #    id: segment1
-    #    scale: 0.3
-    #    value: str(root.value)
-    #    color: '2fc827'
-    #    size_hint: None, None
-    #    size: root.size_gauge / 2, root.size_gauge / 2
-    #    #pos_hint: None, None
-    #    #pos : 20, 20
-    #    center_x: gauge.center_x
-    #    center_y: gauge.center_y + (root.size_gauge / 4)
+    Scatter:
+        id: value_marker
+        size: self.parent.size_gauge, self.parent.size_gauge
+        do_rotation: False
+        do_scale: False
+        do_translation: False
+        rotation: root.needle_start_angle
+        Image:
+            source: root.file_value_marker
+            size: self.parent.size
+            allow_stretch: True
 
     BoxLayout:
         id: segments_box
         orientation: 'horizontal'
         size_hint: None, None
-        size:  (root.segment_scale * 120)/0.2, (root.segment_scale * 30)/0.2
+        size:  (root.segment_scale * 180)/0.2, (root.segment_scale * 30)/0.2 
         center_x: gauge.center_x #+ 70
-        center_y: gauge.center_y + (root.size_gauge / 4)  - 100
+        center_y: gauge.center_y + (root.size_gauge / 4)  - 160
         spacing: 0
         padding: [0, 0, 0, 0]
+
+
+    Label:
+        id: value_max
+        text: str(root.max_value_encountered)
+        pos: 500,200
+        color: 1, 0, 0, 1
+        font_size: 20
+
+    Button:
+        id: button_reset_marker
+        text: 'Reset max value'
+        size_hint: None, None
+        size: 200, 50
+        pos: 500,100
+        on_press: root.reset_max_value()
+    
+
+        
+            
