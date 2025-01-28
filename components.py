@@ -7,6 +7,8 @@ from kivy.graphics import Color, Ellipse, Mesh, Scale
 from kivy.utils import get_color_from_hex
 import math
 from kivy.uix.boxlayout import BoxLayout
+from plyer import accelerometer
+from kivy.clock import Clock
 
 class Gauge(Widget):
 
@@ -49,14 +51,28 @@ class Gauge(Widget):
     number_digits = NumericProperty()
     segment_scale = NumericProperty(0.3)
     
-    
-    
+    inclination_x = NumericProperty(0)
+    inclination_y = NumericProperty(0)
+    inclination_z = NumericProperty(0)
+    inclination_text = StringProperty("X: 0, Y: 0, Z: 0")
+
     def __init__(self, **kwargs):
         super(Gauge, self).__init__(**kwargs)
         self.bind(value=self._turn)
         self.marker_startangle = -self.unit * 100 / 2  
         self.needle_start_angle = self.unit * 100 / 2
-   
+
+        accelerometer.enable()
+        Clock.schedule_interval(self.update_inclination, 1.0 / 60.0)
+
+    def update_inclination(self, dt):
+        try:
+            val = accelerometer.acceleration[:3]
+            if val != (None, None, None):
+                self.inclination_x, self.inclination_y, self.inclination_z = val
+                self.inclination_text = f"X: {self.inclination_x:.2f}, Y: {self.inclination_y:.2f}, Z: {self.inclination_z:.2f}"
+        except:
+            pass
 
     def _turn(self, *args):
         self.ids.needle.rotation = (50 * self.unit) - ((self.value - self.min_slidder)*(100/(self.max_slidder-self.min_slidder)) * self.unit) #50 fait que l'aiguille n'aille pas dans les negatifs 
