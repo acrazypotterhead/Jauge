@@ -18,7 +18,7 @@ class GaugeApp(App):
     def build(self):
         box = BoxLayout(orientation='horizontal', padding=5)
 
-        self.gauge = Gauge(value=0, size_gauge=450)   #initialisation de la jauge
+        self.gauge = Gauge(value=0, size_gauge=800)   #initialisation de la jauge
         self.gauge.pos = 100, 100
         self.slider1 = Slider(orientation='horizontal', min=self.gauge.min_slidder , max= self.gauge.max_slidder, step=0.01)  #initialisation du slider de données
 
