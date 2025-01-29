@@ -51,10 +51,7 @@ class Gauge(Widget):
     number_digits = NumericProperty()
     segment_scale = NumericProperty(0.3)
     
-    inclination_x = NumericProperty(0)
-    inclination_y = NumericProperty(0)
-    inclination_z = NumericProperty(0)
-    inclination_text = StringProperty("X: 0, Y: 0, Z: 0")
+    
 
     def __init__(self, **kwargs):
         super(Gauge, self).__init__(**kwargs)
@@ -62,17 +59,9 @@ class Gauge(Widget):
         self.marker_startangle = -self.unit * 100 / 2  
         self.needle_start_angle = self.unit * 100 / 2
 
-        accelerometer.enable()
-        Clock.schedule_interval(self.update_inclination, 1.0 / 60.0)
+        self.sensorEnabled = False
 
-    def update_inclination(self, dt):
-        try:
-            val = accelerometer.acceleration[:3]
-            if val != (None, None, None):
-                self.inclination_x, self.inclination_y, self.inclination_z = val
-                self.inclination_text = f"X: {self.inclination_x:.2f}, Y: {self.inclination_y:.2f}, Z: {self.inclination_z:.2f}"
-        except:
-            pass
+        
 
     def _turn(self, *args):
         self.ids.needle.rotation = (50 * self.unit) - ((self.value - self.min_slidder)*(100/(self.max_slidder-self.min_slidder)) * self.unit) #50 fait que l'aiguille n'aille pas dans les negatifs 
@@ -133,6 +122,44 @@ class Gauge(Widget):
             for digit in digits:
                 segment = Segment(scale=self.segment_scale, value=str(digit), color='2fc827')
                 self.ids.segments_box.add_widget(segment)
+
+
+
+    def do_toggle(self):
+        if not self.sensorEnabled:
+            try:
+                accelerometer.enable()
+                print(accelerometer.acceleration)
+                self.sensorEnabled = True
+                self.ids.toggle_button.text = "Stop Accelerometer"
+            except:
+                print("Accelerometer is not implemented for your platform")
+    
+            if self.sensorEnabled:
+                Clock.schedule_interval(self.get_acceleration, 1 / 20)
+            else:
+                accelerometer.disable()
+                status = "Accelerometer is not implemented for your platform"
+                self.ids.toggle_button.text = status
+        else:
+            # Stop de la capture
+            accelerometer.disable()
+            Clock.unschedule(self.get_acceleration)
+    
+            # Retour à l'état arrété
+            self.sensorEnabled = False
+            self.ids.toggle_button.text = "Start Accelerometer"
+    
+    def get_acceleration(self, dt):
+        if self.sensorEnabled:
+            val = accelerometer.acceleration[:3]
+    
+            if not val == (None, None, None):
+                self.ids.x_label.text = "X: " + str(val[0])
+                self.ids.y_label.text = "Y: " + str(val[1])
+                self.ids.z_label.text = "Z: " + str(val[2])
+                self.value = val[0]
+
 
 class Segment(RelativeLayout):
     '''

@@ -20,14 +20,14 @@ class GaugeApp(App):
 
         self.gauge = Gauge(value=0, size_gauge=800)   #initialisation de la jauge
         self.gauge.pos = 100, 100
-        self.slider1 = Slider(orientation='horizontal', min=self.gauge.min_slidder , max= self.gauge.max_slidder, step=0.01)  #initialisation du slider de données
-
-        self.slider1.size_hint = None, None
-        self.slider1.size = 200, 50
-        self.slider1.pos_hint = {'center_x': 0.5, 'center_y':0.5}
-
-        
-        self.slider1.bind(value = self.update_gauge)
+        #self.slider1 = Slider(orientation='horizontal', min=self.gauge.min_slidder , max= self.gauge.max_slidder, step=0.01)  #initialisation du slider de données
+#
+        #self.slider1.size_hint = None, None
+        #self.slider1.size = 200, 50
+        #self.slider1.pos_hint = {'center_x': 0.5, 'center_y':0.5}
+#
+        #
+        #self.slider1.bind(value = self.update_gauge)
         
         #self.gauge_barre=Gauge_barre()
 
@@ -38,7 +38,7 @@ class GaugeApp(App):
         
         
         box.add_widget(self.gauge) 
-        box.add_widget(self.slider1) 
+        #box.add_widget(self.slider1) 
 
         #box.add_widget(self.slider2)
         #box.add_widget(self.gauge_barre)
@@ -46,6 +46,10 @@ class GaugeApp(App):
         #self.slider2.bind(value = self.update_gauge_barre)
 
   
+
+
+
+
         return box
 
     def update_gauge_barre(self, instance, value):
@@ -55,7 +59,7 @@ class GaugeApp(App):
         formatted_value = f"{value:.2f}"  # Formate la valeur pour afficher exactement deux chiffres après la virgule
         self.gauge.value = float(formatted_value)
         
-        self.gauge.create_segments(formatted_value)
+        #self.gauge.create_segments(formatted_value)
 
 #class SegmentApp(App):
 #

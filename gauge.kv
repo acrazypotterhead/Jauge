@@ -128,15 +128,15 @@
             size: self.parent.size
             allow_stretch: True
 
-    BoxLayout:
-        id: segments_box
-        orientation: 'horizontal'
-        size_hint: None, None
-        size:  (root.segment_scale * 180)/0.2, (root.segment_scale * 30)/0.2 
-        center_x: gauge.center_x #+ 70
-        center_y: gauge.center_y + (root.size_gauge / 4)  - 160
-        spacing: 0
-        padding: [0, 0, 0, 0]
+    #BoxLayout:
+    #    id: segments_box
+    #    orientation: 'horizontal'
+    #    size_hint: None, None
+    #    size:  (root.segment_scale * 180)/0.2, (root.segment_scale * 30)/0.2 
+    #    center_x: gauge.center_x #+ 70
+    #    center_y: gauge.center_y + (root.size_gauge / 4)  - 160
+    #    spacing: 0
+    #    padding: [0, 0, 0, 0]
 
 
     Label:
@@ -155,9 +155,37 @@
         on_press: root.reset_max_value()
     
 
+    Button:
+        id: toggle_button
+        text: "Start Accelerometer"
+        pos: 1000, 200
+        on_press: root.do_toggle()
+
     Label:
-        text: root.inclination_text
-        pos: 1000, 700
+        id: x_label
+        text: "X: 0"
+        pos: 1000, 400
         size_hint: None, None
         size: self.texture_size
+
+    Label:
+        id: y_label
+        text: "Y: 0"
+        pos: 1000, 450
+        size_hint: None, None
+        size: self.texture_size
+
+    Label:
+        id: z_label
+        text: "Z: 0"
+        pos: 1000, 500
+        size_hint: None, None
+        size: self.texture_size
+
+    Label:
+        id: value
+        text: str(root.value)
+        pos: 1000,600
+        color: 1, 1, 0, 1
+        font_size: 20
             
