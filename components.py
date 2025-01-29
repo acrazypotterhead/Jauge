@@ -13,8 +13,8 @@ from kivy.clock import Clock
 class Gauge(Widget):
 
     #Valeur max de la jauge
-    min_slidder = NumericProperty(200)
-    max_slidder = NumericProperty(500)
+    min_slidder = NumericProperty()
+    max_slidder = NumericProperty(10)
     variable = NumericProperty()
     unit = NumericProperty(3) 
 
@@ -58,7 +58,7 @@ class Gauge(Widget):
         self.bind(value=self._turn)
         self.marker_startangle = -self.unit * 100 / 2  
         self.needle_start_angle = self.unit * 100 / 2
-
+        self.min_slidder = -10
         self.sensorEnabled = False
 
         
