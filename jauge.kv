@@ -1,0 +1,142 @@
+<Jauge>:
+        
+    #size_hint: None, None
+    #size: root.size_gauge, root.size_gauge
+    variable: root.size_gauge/600
+
+
+    #Importation de l'image de la jauge
+
+    Image:
+        id: gauge
+        source: root.file_gauge
+        size_hint: None, None
+        width: root.size_gauge
+        height: root.size_gauge
+        #size: root.size_gauge, root.size_gauge
+        #allow_stretch: True
+        pos_hint: {'center_x': 0.5, 'center_y': 0.6}
+#
+    #Dessin du marqueur de la jauge et du cercle blanc au centre
+    Widget:
+        id: marker
+        size_hint: None, None
+        width: root.size_gauge
+        height: root.size_gauge
+        #size: root.size_gauge, root.size_gauge
+        pos_hint: {'center_x': 0.5, 'center_y': 0.6}
+        canvas.before:
+            
+            # Marqueur
+            Ellipse: 
+                pos:(self.center_x - (self.size[0] - (110* root.variable)) / 2, self.center_y - (self.size[1] - (110*root.variable)) / 2 - (15*root.variable))
+                size: self.size[0]-(110*root.variable), self.size[1]-(110*root.variable)
+                angle_start: root.marker_startangle 
+                angle_end: root._angle if root._angle > root.marker_startangle else root.marker_startangle
+                source: root.file_background_color
+        canvas: 
+            
+            Color:
+                rgba: 255/255, 233/255, 204/255, 1 
+            # Cercle blanc
+            Ellipse: 
+                
+                pos: (self.center_x - (self.size[0] - (root.size_center*root.variable)) / 2  , self.center_y - (self.size[1] - (root.size_center*root.variable)) / 2  - (0*root.variable))
+                size: self.size[0]-((root.size_center*root.variable)), self.size[1]-((root.size_center*root.variable))
+#
+    
+    # Importation de l'image de l'aiguille
+    Scatter:
+        id: needle
+        size_hint: None, None
+        width: root.size_gauge
+        height: root.size_gauge
+        #size: root.size_gauge, root.size_gauge
+        pos_hint: {'center_x': 0.5, 'center_y': 0.6}
+        do_rotation: False
+        do_scale: False
+        do_translation: False
+        rotation : root.needle_start_angle
+        Image:
+            source: root.file_needle
+            size: self.parent.size
+            allow_stretch: True
+#
+    # Importation de l'image du marqueur de valeur max
+    Scatter:
+        id: value_marker
+        size_hint: None, None
+        width: root.size_gauge
+        height: root.size_gauge
+        #size: root.size_gauge, root.size_gauge
+        pos_hint: {'center_x': 0.5, 'center_y': 0.6}
+        do_rotation: False
+        do_scale: False
+        do_translation: False
+        rotation: root.needle_start_angle
+        Image:
+            source: root.file_value_marker
+            size: self.parent.size
+            allow_stretch: True
+
+    # Affichage de la valeur max de la jauge
+    Label:
+        id: value_max
+        text: str(root.max_value_encountered)
+        pos_hint: {'center_x': 0.5, 'center_y': 0.7}
+        color: 1, 0, 0, 1
+        font_size: 20
+#
+    Label:
+        id: label_value
+        text: "Valeur de la  jauge: {:.2f}".format(root.value)
+        size_hint: None, None
+        pos_hint: {'center_x': 0.5, 'center_y': 0.25}
+        color: 1, 0, 0, 1
+        font_size: 20
+
+    # Bouton pour réinitialiser la valeur max
+    Button:
+        id: button_reset_marker
+        text: 'Reset max value'
+        size_hint: None, None
+        width: 200
+        height: 50
+        #size: 200, 50
+        pos: 500,100
+        on_press: root.reset_max_value()
+
+    Slider:
+        orientation: 'horizontal'
+        min: root.min_slidder
+        max: root.max_slidder
+        step: 1
+        size_hint: None, None
+        width: 300
+        height: 50
+        #size: 300, 50
+        pos_hint: {'center_x': 0.5, 'center_y': 0.1}
+        value: root.value
+        on_value: root.round_value(self.value)
+        
+
+
+    #Affichage de la valeur de la jauge avec des 7 segments
+    #BoxLayout:
+    #    id: segments_box
+    #    orientation: 'horizontal'
+    #    size_hint: None, None
+    #    pos_hint: {'center_x': 0.5, 'center_y': 0.6}
+    #    size:  (root.segment_scale * 180)/0.2, (root.segment_scale * 30)/0.2 
+    #    center_x: gauge.center_x #+ 70
+    #    center_y: gauge.center_y + (root.size_gauge / 4)  - 160
+    #    spacing: 0
+    #    padding: [0, 0, 0, 0]
+#
+    #
+#
+    
+
+
+        
+        

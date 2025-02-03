@@ -1,88 +1,78 @@
-from kivy.uix.effectwidget import Rectangle
-# gauge.py
+from kivy.uix.accordion import FloatLayout
 from kivy.uix.widget import Widget
-from kivy.properties import NumericProperty, StringProperty, BoundedNumericProperty, ListProperty, BooleanProperty
-from kivy.uix.relativelayout import RelativeLayout
-from kivy.graphics import Color, Ellipse, Mesh, Scale
+from kivy.properties import NumericProperty, StringProperty, ListProperty, BooleanProperty, BoundedNumericProperty
+from kivy.graphics import Color, Mesh, Scale
 from kivy.utils import get_color_from_hex
-import math
-from kivy.uix.boxlayout import BoxLayout
-from plyer import accelerometer
+from kivy.uix.relativelayout import RelativeLayout
 from kivy.clock import Clock
 
-class Gauge(Widget):
 
-    #Valeur max de la jauge
-    min_slidder = NumericProperty()
+class Jauge(RelativeLayout):
+    #Borne de la jauge
+    min_slidder = NumericProperty(0)
     max_slidder = NumericProperty(10)
+
     variable = NumericProperty()
-    unit = NumericProperty(3) 
-
-    
+    unit = BoundedNumericProperty(3, min=1.8, max=3.6, errorvalue=1.8) 
     _angle          = NumericProperty(-180)  
-
     marker_startangle = NumericProperty()
-    needle_start_angle = NumericProperty()
-
- 
-    size_center = NumericProperty(194)
-    
-    value = BoundedNumericProperty(0, min=0, max=500, errorvalue=0)
+    needle_start_angle = NumericProperty(90)
+    size_center = NumericProperty(217)
+    value = NumericProperty()
     path = __file__
 
     # Importation images
-    file_gauge = StringProperty("images/cadran3.jpg")
-    file_needle = StringProperty("images/aiguille violette.png")
+    file_gauge = StringProperty("images/cadran 1.png")
+    file_needle = StringProperty("images/aiguille 1.png")
     file_marker = StringProperty("images/marker.png")
     file_background_color = StringProperty("images/couleur1.jpg")
     file_value_marker = StringProperty("images/trait_rouge.png")
 
     size_gauge = NumericProperty()
-    size_text = NumericProperty()
-    
     marker_color = ListProperty([1, 1, 1, 1])
-
-    
-    max_value_encountered = NumericProperty(0)
+    max_value_encountered = NumericProperty()
     show_marker = BooleanProperty(True)
-    
     segment_color = StringProperty('2fc827')
-    
     number_digits = NumericProperty()
     segment_scale = NumericProperty(0.3)
     
-    
-
     def __init__(self, **kwargs):
-        super(Gauge, self).__init__(**kwargs)
+        super(Jauge, self).__init__(**kwargs)
+        
         self.bind(value=self._turn)
-        self.marker_startangle = -self.unit * 100 / 2  
-        self.needle_start_angle = self.unit * 100 / 2
-        self.min_slidder = -10
-        self.sensorEnabled = False
-
+        self.marker_startangle = kwargs.get('marker_startangle', -self.unit * 100 / 2)  
+        self.needle_start_angle = kwargs.get('needle_start_angle', self.unit * 100 / 2)
+        #self.min_slidder = kwargs.get('min_slidder',-10)
+        
+   
+    def _turn(self, *args):
         
 
-    def _turn(self, *args):
         self.ids.needle.rotation = (50 * self.unit) - ((self.value - self.min_slidder)*(100/(self.max_slidder-self.min_slidder)) * self.unit) #50 fait que l'aiguille n'aille pas dans les negatifs 
         self._angle = ((self.value - self.min_slidder)*(100/(self.max_slidder-self.min_slidder)) * self.unit)-50 * self.unit
-
         
+        
+
         if self.value > self.max_value_encountered:
             self.max_value_encountered = self.value
+            
 
         # Mettre à jour la rotation du value_marker
         self.ids.value_marker.rotation = (50 * self.unit) - ((self.max_value_encountered - self.min_slidder) * (100 / (self.max_slidder - self.min_slidder)) * self.unit)
+        
+    
 
+    def round_value(self, value):
+        print(f"round_value appelé avec {value}")
+        self.value = value #round(value, 2)  # Limiter la valeur à deux chiffres après la virgule
+        #self.create_segments(self.value)
 
     def reset_max_value(self):
+        print("reset_max_value appelé")
         self.max_value_encountered = 0
         self.ids.value_marker.rotation = self.needle_start_angle
 
-    def is_max(self, value):
-        max = self.value
-        if value > max:
-            return True
+    
         
 
     def contains_value(self, string, value):
@@ -92,12 +82,30 @@ class Gauge(Widget):
         return [int(digit) for digit in str(number)]
     
     def split_number_decimal(self, number):
-        integer_part, decimal_part = str(number).split('.')
+        number_str = str(number)
+        is_negative = number_str.startswith('-')
+        
+        if is_negative:
+            number_str = number_str[1:]  # Supprimer le signe négatif pour le traitement
+
+        integer_part, decimal_part = number_str.split('.')
         integer_digits = [int(digit) for digit in integer_part]
         decimal_digits = [int(digit) for digit in decimal_part]
-        return integer_digits, decimal_digits
 
+        if is_negative:
+            integer_digits.insert(0, '-')  # Ajouter le signe négatif à la partie entière
+
+        return integer_digits, decimal_digits
+    
     def create_segments(self, number):
+        self.ids.segments_box.clear_widgets()
+        number_str = str(number)
+
+        if number_str.startswith('-'):
+            segment = Segment(scale=self.segment_scale, value='-', color=self.segment_color)
+            self.ids.segments_box.add_widget(segment)
+            number_str = number_str[1:]  # Remove the negative sign for further processing
+            
         if self.contains_value(str(number), '.'):
             integer_digits, decimal_digits = self.split_number_decimal(number)
             self.ids.segments_box.clear_widgets()
@@ -122,44 +130,6 @@ class Gauge(Widget):
             for digit in digits:
                 segment = Segment(scale=self.segment_scale, value=str(digit), color='2fc827')
                 self.ids.segments_box.add_widget(segment)
-
-
-
-    def do_toggle(self):
-        if not self.sensorEnabled:
-            try:
-                accelerometer.enable()
-                print(accelerometer.acceleration)
-                self.sensorEnabled = True
-                self.ids.toggle_button.text = "Stop Accelerometer"
-            except:
-                print("Accelerometer is not implemented for your platform")
-    
-            if self.sensorEnabled:
-                Clock.schedule_interval(self.get_acceleration, 1 / 20)
-            else:
-                accelerometer.disable()
-                status = "Accelerometer is not implemented for your platform"
-                self.ids.toggle_button.text = status
-        else:
-            # Stop de la capture
-            accelerometer.disable()
-            Clock.unschedule(self.get_acceleration)
-    
-            # Retour à l'état arrété
-            self.sensorEnabled = False
-            self.ids.toggle_button.text = "Start Accelerometer"
-    
-    def get_acceleration(self, dt):
-        if self.sensorEnabled:
-            val = accelerometer.acceleration[:3]
-    
-            if not val == (None, None, None):
-                self.ids.x_label.text = "X: " + str(val[0])
-                self.ids.y_label.text = "Y: " + str(val[1])
-                self.ids.z_label.text = "Z: " + str(val[2])
-                self.value = val[0]
-
 
 class Segment(RelativeLayout):
     '''
@@ -294,6 +264,15 @@ class Segment(RelativeLayout):
                 0, 13, 0, 0,
                 0, 27, 0, 0,
                 ]        
+        
+        seg_moins = [
+                30, 115, 0, 0,
+                40, 120, 0, 0,
+                85, 120, 0, 0,
+                95, 115, 0, 0,
+                85, 110, 0, 0,
+                40, 110, 0, 0,
+                ]
 
 
         # Drawing association
@@ -308,6 +287,7 @@ class Segment(RelativeLayout):
         type_8 = [seg_1, seg_2, seg_3, seg_4, seg_5, seg_6, seg_7]
         type_9 = [seg_1, seg_2, seg_3, seg_4, seg_6, seg_7]
         type_point = [seg_point]
+        type_moins = [seg_moins]
        
         # Routing association
         self.type_dic = {
@@ -322,6 +302,7 @@ class Segment(RelativeLayout):
                 "8" : type_8,
                 "9" : type_9,
                 "." : type_point,
+                "-" : type_moins,
                 }
 
         # Binding refresh drawing method
@@ -363,20 +344,3 @@ class Segment(RelativeLayout):
                         indices=self.indice, 
                         mode=self.xmode
                         )
-             
-             
-class Main(BoxLayout):
-    pass
-
-class Valeur_bouton(BoxLayout):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        print("Valeur_bouton instancié :", self)
-    # Avoid if session
-
-class Gauge_barre(Widget):
-    value = NumericProperty()
-    file_background_color = StringProperty("images/couleur1.jpg")
-    file_needle = StringProperty("images/needle_fine.png")
-    max_slidder = NumericProperty(700)
-    min_slidder = NumericProperty(200)
