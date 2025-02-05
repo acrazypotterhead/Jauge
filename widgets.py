@@ -7,13 +7,13 @@ from kivy.uix.relativelayout import RelativeLayout
 from kivy.clock import Clock
 
 
-class Jauge(RelativeLayout):
+class Jauge(Widget):
     #Borne de la jauge
-    min_slidder = NumericProperty(0)
-    max_slidder = NumericProperty(10)
+    min_slidder = NumericProperty(-10)
+    max_slidder = NumericProperty(300)
 
     variable = NumericProperty()
-    unit = BoundedNumericProperty(3, min=1.8, max=3.6, errorvalue=1.8) 
+    unit = BoundedNumericProperty(2.8, min=1.8, max=3.6, errorvalue=1.8) 
     _angle          = NumericProperty(-180)  
     marker_startangle = NumericProperty()
     needle_start_angle = NumericProperty(90)
@@ -31,8 +31,9 @@ class Jauge(RelativeLayout):
     size_gauge = NumericProperty()
     marker_color = ListProperty([1, 1, 1, 1])
     max_value_encountered = NumericProperty()
+    angle_max_value= NumericProperty()
     show_marker = BooleanProperty(True)
-    segment_color = StringProperty('2fc827')
+    segment_color = StringProperty('112689')
     number_digits = NumericProperty()
     segment_scale = NumericProperty(0.3)
     
@@ -44,33 +45,31 @@ class Jauge(RelativeLayout):
         self.needle_start_angle = kwargs.get('needle_start_angle', self.unit * 100 / 2)
         #self.min_slidder = kwargs.get('min_slidder',-10)
         
-   
+  
+       
     def _turn(self, *args):
         
-
-        self.ids.needle.rotation = (50 * self.unit) - ((self.value - self.min_slidder)*(100/(self.max_slidder-self.min_slidder)) * self.unit) #50 fait que l'aiguille n'aille pas dans les negatifs 
         self._angle = ((self.value - self.min_slidder)*(100/(self.max_slidder-self.min_slidder)) * self.unit)-50 * self.unit
-        
-        
-
+    
         if self.value > self.max_value_encountered:
             self.max_value_encountered = self.value
-            
+            self.angle_max_value = self._angle
+
 
         # Mettre à jour la rotation du value_marker
-        self.ids.value_marker.rotation = (50 * self.unit) - ((self.max_value_encountered - self.min_slidder) * (100 / (self.max_slidder - self.min_slidder)) * self.unit)
         
+    
     
 
     def round_value(self, value):
-        print(f"round_value appelé avec {value}")
+        
         self.value = value #round(value, 2)  # Limiter la valeur à deux chiffres après la virgule
-        #self.create_segments(self.value)
+        self.create_segments(self.value)
 
     def reset_max_value(self):
-        print("reset_max_value appelé")
+        
         self.max_value_encountered = 0
-        self.ids.value_marker.rotation = self.needle_start_angle
+        self.angle_max_value = - self.needle_start_angle
 
     
         
@@ -108,7 +107,7 @@ class Jauge(RelativeLayout):
             
         if self.contains_value(str(number), '.'):
             integer_digits, decimal_digits = self.split_number_decimal(number)
-            self.ids.segments_box.clear_widgets()
+            #self.ids.segments_box.clear_widgets()
 
             for digit in integer_digits:
                 segment = Segment(scale=self.segment_scale, value=str(digit), color=self.segment_color)
@@ -124,12 +123,26 @@ class Jauge(RelativeLayout):
                 
         else:
 
-            digits = self.split_number_integer(number)
-            self.ids.segments_box.clear_widgets()
+            digits = self.split_number_integer(number_str)
+            #self.ids.segments_box.clear_widgets()
 
             for digit in digits:
-                segment = Segment(scale=self.segment_scale, value=str(digit), color='2fc827')
+                segment = Segment(scale=self.segment_scale, value=str(digit), color=self.segment_color)
                 self.ids.segments_box.add_widget(segment)
+
+    def change_segments_color_on(self):
+        self.ids.segments_box.clear_widgets()
+        self.segment_color = 'FF0000'
+        self.create_segments(self.value)
+        
+    def change_segments_color_off(self):
+        self.ids.segments_box.clear_widgets()
+        self.segment_color = '112689'
+        self.create_segments(self.value)
+
+    
+        
+
 
 class Segment(RelativeLayout):
     '''
@@ -155,8 +168,8 @@ class Segment(RelativeLayout):
 
     # Object properties configuration
     scale = BoundedNumericProperty(0.1, min=0.1, max=1, errorvalue=0.2)
-    color = StringProperty('2fc827')
-    value = StringProperty('A.')
+    color = StringProperty('')
+    value = StringProperty('')
 
     def __init__(self, **kwargs):     
         super(Segment, self).__init__(**kwargs)

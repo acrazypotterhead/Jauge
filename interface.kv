@@ -1,9 +1,70 @@
-BoxLayout:
+GridLayout:
+    size: root.size
+    pos: root.pos
+    cols: 2
+
+    #Button:
+    #    text: 'Hello world'
+    #    size_hint: 1, 1
+    #    on_press: print('Hello world')
+    #Jauge:
+    #    size_hint: 1,1
+       
     Jauge:
-        
-        size_gauge: 600
+        id: Jauge1
+        size_hint: 1,1
+
+    
+    Jauge:
+        id: Jauge2
+        size_hint: 1,1
+
+    Jauge:
+        id: Jauge3
+        size_hint: 1,1
+
+    Slider:
+        orientation: 'horizontal'
+        min: root.ids.Jauge1.min_slidder
+        max: root.ids.Jauge1.max_slidder
+        step: 1
+        size_hint: None, None
+        width: 300
+        height: 50
+        #size: 300, 50
+        pos_hint: {'center_x': 0.5, 'center_y': 0.1}
+        value: root.ids.Jauge1.value
+        on_value: root.ids.Jauge1.round_value(self.value)
+
+    Slider:
+        orientation: 'horizontal'
+        min: root.ids.Jauge2.min_slidder
+        max: root.ids.Jauge2.max_slidder
+        step: 1
+        size_hint: None, None
+        width: 300
+        height: 50
+        #size: 300, 50
+        pos_hint: {'center_x': 0.5, 'center_y': 0.1}
+        value: root.ids.Jauge2.value
+        on_value: root.ids.Jauge2.round_value(self.value)
+
+    Slider:
+        orientation: 'horizontal'
+        min: root.ids.Jauge3.min_slidder
+        max: root.ids.Jauge3.max_slidder
+        step: 1
+        size_hint: None, None
+        width: 300
+        height: 50
+        #size: 300, 50
+        pos_hint: {'center_x': 0.5, 'center_y': 0.1}
+        value: root.ids.Jauge3.value
+        on_value: root.ids.Jauge3.round_value(self.value)
+
+    
 
 
-    Button:
-        text:
-            "boutton 1"
+    
+
+    
