@@ -1,66 +1,69 @@
 GridLayout:
+
     size: root.size
-    pos: root.pos
-    cols: 2
+    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+    cols: 1
+    rows: 2
+    #row_default_height: 300  # Hauteur par défaut des lignes
+    #col_default_width: 300   # Largeur par défaut des colonnes
+    #row_force_default: True  # Forcer la hauteur par défaut des lignes
+    #col_force_default: True  # Forcer la largeur par défaut des colonnes
 
-    #Button:
-    #    text: 'Hello world'
-    #    size_hint: 1, 1
-    #    on_press: print('Hello world')
-    #Jauge:
-    #    size_hint: 1,1
-       
-    Jauge:
-        id: Jauge1
-        size_hint: 1,1
+    GridLayout:
+        cols: 3
+        rows: 1
+        Jauge:
+            id: Jauge1
+            size_hint: 1,1
 
-    
-    Jauge:
-        id: Jauge2
-        size_hint: 1,1
+        
+        Jauge:
+            id: Jauge2
+            size_hint: 1,1
 
-    Jauge:
-        id: Jauge3
-        size_hint: 1,1
+        Jauge:
+            id: Jauge3
+            size_hint: 1,1
 
-    Slider:
-        orientation: 'horizontal'
-        min: root.ids.Jauge1.min_slidder
-        max: root.ids.Jauge1.max_slidder
-        step: 1
-        size_hint: None, None
-        width: 300
-        height: 50
-        #size: 300, 50
-        pos_hint: {'center_x': 0.5, 'center_y': 0.1}
-        value: root.ids.Jauge1.value
-        on_value: root.ids.Jauge1.round_value(self.value)
+    GridLayout:
+        cols: 3
+        rows: 1
+        row_default_height: 100  # Hauteur par défaut des lignes
+        #col_default_width: 300   # Largeur par défaut des colonnes
+        row_force_default: True  # Forcer la hauteur par défaut des lignes
+        #col_force_default: True  # Forcer la largeur par défaut des colonnes
+        Slider:
+            orientation: 'horizontal'
+            min: root.ids.Jauge1.min_slidder
+            max: root.ids.Jauge1.max_slidder
+            step: 0.1
+            size_hint: 1, 1
+            
+            #pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+            value: root.ids.Jauge1.value
+            on_value: root.ids.Jauge1.round_value(self.value)
 
-    Slider:
-        orientation: 'horizontal'
-        min: root.ids.Jauge2.min_slidder
-        max: root.ids.Jauge2.max_slidder
-        step: 1
-        size_hint: None, None
-        width: 300
-        height: 50
-        #size: 300, 50
-        pos_hint: {'center_x': 0.5, 'center_y': 0.1}
-        value: root.ids.Jauge2.value
-        on_value: root.ids.Jauge2.round_value(self.value)
+        Slider:
+            orientation: 'horizontal'
+            min: root.ids.Jauge2.min_slidder
+            max: root.ids.Jauge2.max_slidder
+            step: 1
+            size_hint: 1,1
 
-    Slider:
-        orientation: 'horizontal'
-        min: root.ids.Jauge3.min_slidder
-        max: root.ids.Jauge3.max_slidder
-        step: 1
-        size_hint: None, None
-        width: 300
-        height: 50
-        #size: 300, 50
-        pos_hint: {'center_x': 0.5, 'center_y': 0.1}
-        value: root.ids.Jauge3.value
-        on_value: root.ids.Jauge3.round_value(self.value)
+            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+            value: root.ids.Jauge2.value
+            on_value: root.ids.Jauge2.round_value(self.value)
+
+        Slider:
+            orientation: 'horizontal'
+            min: root.ids.Jauge3.min_slidder
+            max: root.ids.Jauge3.max_slidder
+            step: 1
+            size_hint: 1,1
+          
+            pos_hint: {'center_x': 0.5, 'center_y': 0.1}
+            value: root.ids.Jauge3.value
+            on_value: root.ids.Jauge3.round_value(self.value)
 
     
 

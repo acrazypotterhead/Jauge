@@ -8,78 +8,116 @@ from kivy.clock import Clock
 
 
 class Jauge(Widget):
-    #Borne de la jauge
-    min_slidder = NumericProperty(-10)
+    #Bornes de la jauge
+    min_slidder = NumericProperty(-100)
     max_slidder = NumericProperty(300)
 
-    variable = NumericProperty()
+    # unit correspond aux degrés de rotation de l'aiguille divisé par 100 
+    # par exemple, pour une rotation de 180°, unit = 1.8 (rotation symetrique sur l'axe des ordonnées)
     unit = BoundedNumericProperty(2.8, min=1.8, max=3.6, errorvalue=1.8) 
-    _angle          = NumericProperty(-180)  
+    _angle = NumericProperty(-200)  
+
+    # Angles de départ de l'aiguille et du marqueur
     marker_startangle = NumericProperty()
     needle_start_angle = NumericProperty(90)
+
+    # Taille du cercle central
     size_center = NumericProperty(217)
+
+    # Valeur de la jauge
     value = NumericProperty()
     path = __file__
 
-    # Importation images
+    # Importation des images
     file_gauge = StringProperty("images/cadran 1.png")
     file_needle = StringProperty("images/aiguille 1.png")
     file_marker = StringProperty("images/marker.png")
     file_background_color = StringProperty("images/couleur1.jpg")
-    file_value_marker = StringProperty("images/trait_rouge.png")
+    file_value_marker_positive = StringProperty("images/trait_rouge.png")
+    file_value_marker_negative = StringProperty("images/trait_bleu.png")
 
-    size_gauge = NumericProperty()
+    # Couleur et opacité de l'image de l'aiguille
     marker_color = ListProperty([1, 1, 1, 1])
-    max_value_encountered = NumericProperty()
-    angle_max_value= NumericProperty()
-    show_marker = BooleanProperty(True)
+
+    # Valeur maximale rencontrée
+    max_positive_value_encountered = NumericProperty()
+    angle_max_positive_value = NumericProperty()
+    max_negative_value_encountered = NumericProperty()
+    angle_max_negative_value = NumericProperty()
+ 
+
+    # Taille et couleur des segments
     segment_color = StringProperty('112689')
-    number_digits = NumericProperty()
+    segment_color_on_hold = StringProperty('FF0000')
     segment_scale = NumericProperty(0.3)
     
+
     def __init__(self, **kwargs):
         super(Jauge, self).__init__(**kwargs)
         
         self.bind(value=self._turn)
         self.marker_startangle = kwargs.get('marker_startangle', -self.unit * 100 / 2)  
         self.needle_start_angle = kwargs.get('needle_start_angle', self.unit * 100 / 2)
-        #self.min_slidder = kwargs.get('min_slidder',-10)
-        
   
-       
+
+    # Méthode de rotation de l'aiguille
     def _turn(self, *args):
         
+        # Calcul de l'angle de rotation de l'aiguille
         self._angle = ((self.value - self.min_slidder)*(100/(self.max_slidder-self.min_slidder)) * self.unit)-50 * self.unit
     
-        if self.value > self.max_value_encountered:
-            self.max_value_encountered = self.value
-            self.angle_max_value = self._angle
 
+        # Mise à jour de la valeur positive maximale rencontrée
+        if self.value > 0:
+            if self.value > self.max_positive_value_encountered:
+                self.max_positive_value_encountered = self.value
+                self.angle_max_positive_value = self._angle
 
-        # Mettre à jour la rotation du value_marker
-        
-    
-    
+        # Mise à jour de la valeur négative maximale rencontrée
+        else:
+            if self.value < self.max_negative_value_encountered:
+                self.max_negative_value_encountered = self.value
+                self.angle_max_negative_value = self._angle
+
 
     def round_value(self, value):
         
-        self.value = value #round(value, 2)  # Limiter la valeur à deux chiffres après la virgule
-        self.create_segments(self.value)
+        self.value = round(value, 2)  # Limiter la valeur à deux chiffres après la virgule
+        self.create_segments(self.value, self.segment_color)
 
-    def reset_max_value(self):
+
+    # Réinitialisation de la valeur maximale positive
+    def reset_max_positive_value(self):
         
-        self.max_value_encountered = 0
-        self.angle_max_value = - self.needle_start_angle
+        self.max_positive_value_encountered = 0
+        self.angle_max_positive_value = - self.needle_start_angle
 
+
+    # Réinitialisation de la valeur maximale négative
+    def reset_max_negative_value(self):
     
-        
+        self.max_negative_value_encountered = 0
+        self.angle_max_negative_value = - self.needle_start_angle
 
+    # Changement de la couleur des segments quand le bouton est enfoncé
+    def change_segments_color_on(self):
+        self.ids.segments_box.clear_widgets()
+        self.create_segments(self.value, self.segment_color_on_hold)
+        
+    def change_segments_color_off(self):
+        self.ids.segments_box.clear_widgets()
+        self.create_segments(self.value, self.segment_color)
+
+
+    # Méthode de vérification de la présence d'une valeur dans une chaîne de caractères
     def contains_value(self, string, value):
         return value in string
 
+    # Méthode de division d'un nombre entier en chiffres
     def split_number_integer(self, number):
         return [int(digit) for digit in str(number)]
     
+    # Méthode de division d'un nombre décimal en chiffres
     def split_number_decimal(self, number):
         number_str = str(number)
         is_negative = number_str.startswith('-')
@@ -91,54 +129,45 @@ class Jauge(Widget):
         integer_digits = [int(digit) for digit in integer_part]
         decimal_digits = [int(digit) for digit in decimal_part]
 
-        if is_negative:
-            integer_digits.insert(0, '-')  # Ajouter le signe négatif à la partie entière
-
         return integer_digits, decimal_digits
     
-    def create_segments(self, number):
+
+    # Méthode de création des segments
+    def create_segments(self, number, base_color):
         self.ids.segments_box.clear_widgets()
         number_str = str(number)
 
         if number_str.startswith('-'):
-            segment = Segment(scale=self.segment_scale, value='-', color=self.segment_color)
+            segment = Segment(scale=self.segment_scale, value='-', color= base_color)
             self.ids.segments_box.add_widget(segment)
-            number_str = number_str[1:]  # Remove the negative sign for further processing
+            number_str = number_str[1:]  # Supprimer le signe négatif pour le traitement
             
         if self.contains_value(str(number), '.'):
             integer_digits, decimal_digits = self.split_number_decimal(number)
-            #self.ids.segments_box.clear_widgets()
+       
 
             for digit in integer_digits:
-                segment = Segment(scale=self.segment_scale, value=str(digit), color=self.segment_color)
+                segment = Segment(scale=self.segment_scale, value=str(digit), color=base_color)
                 self.ids.segments_box.add_widget(segment)
                
-            segment = Segment(scale=self.segment_scale, value='.', color=self.segment_color)
+            segment = Segment(scale=self.segment_scale, value='.', color= base_color)
 
             self.ids.segments_box.add_widget(segment)
 
             for digit in decimal_digits:
-                segment = Segment(scale=self.segment_scale, value=str(digit), color=self.segment_color)
+                segment = Segment(scale=self.segment_scale, value=str(digit), color= base_color)
                 self.ids.segments_box.add_widget(segment)
                 
         else:
 
             digits = self.split_number_integer(number_str)
-            #self.ids.segments_box.clear_widgets()
+
 
             for digit in digits:
-                segment = Segment(scale=self.segment_scale, value=str(digit), color=self.segment_color)
+                segment = Segment(scale=self.segment_scale, value=str(digit), color= base_color)
                 self.ids.segments_box.add_widget(segment)
 
-    def change_segments_color_on(self):
-        self.ids.segments_box.clear_widgets()
-        self.segment_color = 'FF0000'
-        self.create_segments(self.value)
-        
-    def change_segments_color_off(self):
-        self.ids.segments_box.clear_widgets()
-        self.segment_color = '112689'
-        self.create_segments(self.value)
+    
 
     
         
@@ -158,11 +187,7 @@ class Segment(RelativeLayout):
 
     seg = Segment(scale=0.3, value="A.")
 
-    Are permitted : 0 1 2 3 4 5 6 7 8 9 and 0. 1. 2. 3. 4. 5. 6. 7. 8. 9.
-
-    and
-
-    A b C d E F and A. b. C. d. E. F.
+    Available Segment for : 1 2 3 4 5 6 7 8 9 0 . -
 
     '''
 
@@ -230,7 +255,7 @@ class Segment(RelativeLayout):
      
             ]
         seg_5 = [
-            0, 110, 0, 0,         #7 coordonnées
+            0, 110, 0, 0,         
             1, 113, 0, 0,
             3, 112, 0, 0,
             30, 97, 0, 0,
@@ -260,7 +285,7 @@ class Segment(RelativeLayout):
             2, 10, 0, 0,
             1, 12, 0, 0,
             0, 15, 0, 0,
-            0, 45, 0, 0,        #10 coordonnées
+            0, 45, 0, 0,       
             30, 45, 0, 0,
             30, 35, 0, 0,
             95, 35, 0, 0,

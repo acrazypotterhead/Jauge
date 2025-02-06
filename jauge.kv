@@ -1,6 +1,5 @@
 <Jauge>:
         
-    variable: root.size_gauge/600
     size_hint: None, None
     size: root.size
     #size: root.size_gauge, root.size_gauge
@@ -60,28 +59,52 @@
             PopMatrix
 
     
-    # Importation de l'image du marqueur de valeur max
+    # Importation de l'image du marqueur de valeur max positive
 
     Image:
-        id: value_marker
-        source: root.file_value_marker
+        id: value_positve_marker
+        source: root.file_value_marker_positive
         size: root.size
         allow_stretch: True
         pos: root.pos
         canvas.before:
             PushMatrix
             Rotate:
-                angle: - (root.angle_max_value if root.angle_max_value > root.marker_startangle else root.marker_startangle)
+                angle: - (root.angle_max_positive_value if root.angle_max_positive_value > root.marker_startangle else root.marker_startangle)
                 origin: self.center
         canvas.after:
             PopMatrix
 
-    # Affichage de la valeur max de la jauge
+    # Importation de l'image du marqueur de valeur max negative
+    Image:
+        id: value_negative_marker
+        source: root.file_value_marker_negative
+        size: root.size
+        allow_stretch: True
+        pos: root.pos
+        canvas.before:
+            PushMatrix
+            Rotate:
+                angle: - (root.angle_max_negative_value if root.angle_max_negative_value > root.marker_startangle else root.marker_startangle)
+                origin: self.center
+        canvas.after:
+            PopMatrix
+    
+
+    # Affichage de la valeur positive max de la jauge
     Label:
         id: value_max
-        text: str(root.max_value_encountered)
-        pos: root.center_x *0.9, root.pos[1] 
+        text: str(root.max_positive_value_encountered)
+        pos: (root.pos[0] + root.width - self.width, root.pos[1])
         color: 1, 0, 0, 1
+        font_size: 20
+
+    # Affichage de la valeur negative max de la jauge
+    Label:
+        id: value_min
+        text: str(root.max_negative_value_encountered)
+        pos: root.pos[0] , root.pos[1] 
+        color: 0, 0, 1, 1
         font_size: 20
 
 
@@ -93,7 +116,8 @@
         height: 70
         center: root.center
         background_color: 1,1,1,0
-        on_press: root.reset_max_value()
+        on_press: root.reset_max_positive_value()
+        on_release: root.reset_max_negative_value()
         on_press: root.change_segments_color_on()
         on_release: root.change_segments_color_off()
  
