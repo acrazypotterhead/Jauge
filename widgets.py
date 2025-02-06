@@ -5,7 +5,7 @@ from kivy.graphics import Color, Mesh, Scale
 from kivy.utils import get_color_from_hex
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.clock import Clock
-
+from plyer import accelerometer
 
 class Jauge(Widget):
     #Bornes de la jauge
@@ -51,6 +51,7 @@ class Jauge(Widget):
     segment_color_on_hold = StringProperty('FF0000')
     segment_scale = NumericProperty(0.3)
     
+    choice = StringProperty("")
 
     def __init__(self, **kwargs):
         super(Jauge, self).__init__(**kwargs)
@@ -58,7 +59,7 @@ class Jauge(Widget):
         self.bind(value=self._turn)
         self.marker_startangle = kwargs.get('marker_startangle', -self.unit * 100 / 2)  
         self.needle_start_angle = kwargs.get('needle_start_angle', self.unit * 100 / 2)
-  
+        self.sensorEnabled = False
 
     # Méthode de rotation de l'aiguille
     def _turn(self, *args):
@@ -170,7 +171,43 @@ class Jauge(Widget):
     
 
     
-        
+    def do_toggle(self):
+        if not self.sensorEnabled:
+            try:
+                accelerometer.enable()
+                print(accelerometer.acceleration)
+                self.sensorEnabled = True
+                self.ids.toggle_button.text = "Stop Accelerometer"
+            except:
+                print("Accelerometer is not implemented for your platform")
+    
+            if self.sensorEnabled:
+                Clock.schedule_interval(self.get_acceleration, 1 / 20)
+            else:
+                accelerometer.disable()
+                status = "Accelerometer is not implemented for your platform"
+                self.ids.toggle_button.text = status
+        else:
+            # Stop de la capture
+            accelerometer.disable()
+            Clock.unschedule(self.get_acceleration)
+    
+            # Retour à l'état arrété
+            self.sensorEnabled = False
+            self.ids.toggle_button.text = "Start Accelerometer"
+
+    def get_acceleration(self, dt):
+        if self.sensorEnabled:
+            val = accelerometer.acceleration[:3]
+    
+            if not val == (None, None, None):
+                if self.choice == "x":
+                    self.value = val[0]
+                elif self.choice == "y":
+                    self.value = val[1]
+                elif self.choice == "z":
+                    self.value = val[2]
+                
 
 
 class Segment(RelativeLayout):
