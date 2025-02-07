@@ -9,8 +9,8 @@ from plyer import accelerometer
 
 class Jauge(Widget):
     #Bornes de la jauge
-    min_slidder = NumericProperty(-100)
-    max_slidder = NumericProperty(300)
+    min_slidder = NumericProperty(-20)
+    max_slidder = NumericProperty(20)
 
     # unit correspond aux degrés de rotation de l'aiguille divisé par 100 
     # par exemple, pour une rotation de 180°, unit = 1.8 (rotation symetrique sur l'axe des ordonnées)
@@ -203,10 +203,16 @@ class Jauge(Widget):
             if not val == (None, None, None):
                 if self.choice == "x":
                     self.value = val[0]
+                    self.value = round(self.value, 2)  # Limiter la valeur à deux chiffres après la virgule
+                    self.create_segments(self.value, self.segment_color)
                 elif self.choice == "y":
                     self.value = val[1]
+                    self.value = round(self.value, 2)  # Limiter la valeur à deux chiffres après la virgule
+                    self.create_segments(self.value, self.segment_color)
                 elif self.choice == "z":
                     self.value = val[2]
+                    self.value = round(self.value, 2)  # Limiter la valeur à deux chiffres après la virgule
+                    self.create_segments(self.value, self.segment_color)
                 
 
 
