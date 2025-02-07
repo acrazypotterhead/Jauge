@@ -8,29 +8,24 @@ from kivy.clock import Clock
 from plyer import accelerometer
 
 class Jauge(Widget):
-    
+
+    # __Valeurs à changer__ 
 
     #Bornes de la jauge
-    min_slidder = NumericProperty(-20)
-    max_slidder = NumericProperty(20)
+    min_slidder = NumericProperty(-100)
+    max_slidder = NumericProperty(300)
 
     # unit correspond aux degrés de rotation de l'aiguille divisé par 100 
     # par exemple, pour une rotation de 180°, unit = 1.8 (rotation symetrique sur l'axe des ordonnées)
-    unit = BoundedNumericProperty(2.8, min=1.8, max=3.6, errorvalue=1.8)
+    unit = BoundedNumericProperty(2.8, min=1.8, max=3.6, errorvalue=1.8) 
 
     # Angle de rotation de l'aiguille, a initialiser à la même valeur que marker_startangle
     _angle = NumericProperty(-180)  
 
-    # Angles de départ de l'aiguille et du marqueur
-    marker_startangle = NumericProperty()
-    needle_start_angle = NumericProperty(90)
-
-    # Taille du cercle central
-    size_center = NumericProperty(217)
-
-    # Valeur de la jauge
-    value = NumericProperty()
-    path = __file__
+    # Pourcentage du rayon de la jauge pour dessiner le cercle au milieu
+    rayon_center = NumericProperty(0.69)
+    # Pourcentage du rayon de la jauge pour dessiner le marqueur autour de la jauge
+    rayon_marker = NumericProperty(0.93)
 
     # Importation des images
     file_gauge = StringProperty("images/cadran 1.png")
@@ -40,22 +35,30 @@ class Jauge(Widget):
     file_value_marker_positive = StringProperty("images/trait_rouge.png")
     file_value_marker_negative = StringProperty("images/trait_bleu.png")
 
-    # Couleur et opacité de l'image de l'aiguille
-    marker_color = ListProperty([1, 1, 1, 1])
+    # Taille et couleur des segments 
+    segment_color = StringProperty('112689')
+    segment_color_on_hold = StringProperty('FF0000')
+    segment_scale = NumericProperty(0.3)
 
-    # Valeur maximale rencontrée
+    # __Valeur d'initialisation de la jauge__
+
+    # Angles de départ de l'aiguille et du marqueur, ils sont calculer en fonction de la valeur de l'unit dans def __init__
+    marker_startangle = NumericProperty()
+    needle_start_angle = NumericProperty()
+
+    # Valeur de la jauge
+    value = NumericProperty()
+
+    # Valeur maximale rencontrée (postive et négative)
     max_positive_value_encountered = NumericProperty()
     angle_max_positive_value = NumericProperty()
     max_negative_value_encountered = NumericProperty()
     angle_max_negative_value = NumericProperty()
  
-
-    # Taille et couleur des segments
-    segment_color = StringProperty('112689')
-    segment_color_on_hold = StringProperty('FF0000')
-    segment_scale = NumericProperty(0.3)
-    
+    # Choix de l'axe de rotation pour les valeurs de l'accéléromètre sur une jauge
     choice = StringProperty("")
+    
+
 
     def __init__(self, **kwargs):
         super(Jauge, self).__init__(**kwargs)
@@ -207,16 +210,10 @@ class Jauge(Widget):
             if not val == (None, None, None):
                 if self.choice == "x":
                     self.value = val[0]
-                    self.value = round(self.value, 2)  # Limiter la valeur à deux chiffres après la virgule
-                    self.create_segments(self.value, self.segment_color)
                 elif self.choice == "y":
                     self.value = val[1]
-                    self.value = round(self.value, 2)  # Limiter la valeur à deux chiffres après la virgule
-                    self.create_segments(self.value, self.segment_color)
                 elif self.choice == "z":
                     self.value = val[2]
-                    self.value = round(self.value, 2)  # Limiter la valeur à deux chiffres après la virgule
-                    self.create_segments(self.value, self.segment_color)
                 
 
 

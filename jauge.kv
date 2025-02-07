@@ -2,7 +2,7 @@
         
     size_hint: None, None
     size: root.size
-    #size: root.size_gauge, root.size_gauge
+
 
     #Importation de l'image de la jauge
     Image:
@@ -11,8 +11,8 @@
         allow_stretch: True
         size: root.size
         pos: root.pos
-#
-    ##Dessin du marqueur de la jauge et du cercle blanc au centre
+
+    #Dessin du marqueur de la jauge et du cercle blanc au centre
     Widget:
         id: marker
         size_hint: None, None
@@ -24,21 +24,22 @@
             Color:
                 rgba: 1, 1, 1, 0.5
             Ellipse: 
-                pos:(self.center_x - (min(self.size)) / 2 , self.center_y - (min(self.size)) / 2 )
-                size: min(self.size), min(self.size) 
+                pos:(self.center_x - (min(self.size)*root.rayon_marker ) / 2 , self.center_y - (min(self.size)*root.rayon_marker) / 2 )
+                size: min(self.size)*root.rayon_marker, min(self.size) * root.rayon_marker
                 angle_start: root.marker_startangle 
                 angle_end: root._angle if root._angle > root.marker_startangle else root.marker_startangle
                 source: root.file_background_color
         canvas: 
             
+            # Couleur du cercle au milieu qui est la meme que le fond de la page
             Color:
                 rgba: 255/255, 233/255, 204/255, 1 
                 
             # Cercle blanc
             Ellipse: 
                 
-                pos: (self.center_x - (min(self.size) *0.69) / 2  , self.center_y - (min(self.size) *0.69) / 2  )
-                size: min(self.size)*0.69, min(self.size)*0.69
+                pos: (self.center_x - (min(self.size) *root.rayon_center) / 2  , self.center_y - (min(self.size) *root.rayon_center) / 2  )
+                size: min(self.size)*root.rayon_center, min(self.size)*root.rayon_center
 #
     
     # Importation de l'image de l'aiguille
@@ -94,7 +95,7 @@
     # Affichage de la valeur positive max de la jauge
     Label:
         id: value_max
-        text: str(root.max_positive_value_encountered)
+        text: str(round(root.max_positive_value_encountered,2))
         pos: (root.pos[0] + root.width - self.width, root.pos[1])
         color: 1, 0, 0, 1
         font_size: 20
@@ -102,7 +103,7 @@
     # Affichage de la valeur negative max de la jauge
     Label:
         id: value_min
-        text: str(root.max_negative_value_encountered)
+        text: str(round(root.max_negative_value_encountered,2))
         pos: root.pos[0] , root.pos[1] 
         color: 0, 0, 1, 1
         font_size: 20
