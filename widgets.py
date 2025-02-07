@@ -8,14 +8,18 @@ from kivy.clock import Clock
 from plyer import accelerometer
 
 class Jauge(Widget):
+    
+
     #Bornes de la jauge
     min_slidder = NumericProperty(-20)
     max_slidder = NumericProperty(20)
 
     # unit correspond aux degrés de rotation de l'aiguille divisé par 100 
     # par exemple, pour une rotation de 180°, unit = 1.8 (rotation symetrique sur l'axe des ordonnées)
-    unit = BoundedNumericProperty(2.8, min=1.8, max=3.6, errorvalue=1.8) 
-    _angle = NumericProperty(-200)  
+    unit = BoundedNumericProperty(2.8, min=1.8, max=3.6, errorvalue=1.8)
+
+    # Angle de rotation de l'aiguille, a initialiser à la même valeur que marker_startangle
+    _angle = NumericProperty(-180)  
 
     # Angles de départ de l'aiguille et du marqueur
     marker_startangle = NumericProperty()
