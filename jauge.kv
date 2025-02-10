@@ -1,7 +1,7 @@
 <Jauge>:
         
     size_hint: None, None
-    size: root.size
+
 
 
     #Importation de l'image de la jauge
@@ -24,8 +24,8 @@
             Color:
                 rgba: 1, 1, 1, 0.5
             Ellipse: 
-                pos:(self.center_x - (min(self.size)*root.rayon_marker ) / 2 , self.center_y - (min(self.size)*root.rayon_marker) / 2 )
-                size: min(self.size)*root.rayon_marker, min(self.size) * root.rayon_marker
+                pos:(self.center_x - (min(self.size) ) / 2 , self.center_y - (min(self.size)) / 2 )
+                size: min(self.size), min(self.size)
                 angle_start: root.marker_startangle 
                 angle_end: root._angle if root._angle > root.marker_startangle else root.marker_startangle
                 source: root.file_background_color
@@ -33,13 +33,14 @@
             
             # Couleur du cercle au milieu qui est la meme que le fond de la page
             Color:
-                rgba: 255/255, 233/255, 204/255, 1 
+                rgba: 255/255, 233/255, 204/255, 0.2 
                 
             # Cercle blanc
             Ellipse: 
                 
-                pos: (self.center_x - (min(self.size) *root.rayon_center) / 2  , self.center_y - (min(self.size) *root.rayon_center) / 2  )
-                size: min(self.size)*root.rayon_center, min(self.size)*root.rayon_center
+                pos: (self.center_x - (min(self.size) ) / 2  , self.center_y - (min(self.size) ) / 2  )
+                size: min(self.size), min(self.size)
+                source: root.file_center
 #
     
     # Importation de l'image de l'aiguille
@@ -124,12 +125,18 @@
  
 
     #Affichage de la valeur de la jauge avec des 7 segments
-    BoxLayout:
-        id: segments_box
-        orientation: 'horizontal'
-        size_hint: None, None
+    GridLayout:
         
-        size:  (root.segment_scale * 180)/0.2, (root.segment_scale * 30)/0.2 
+        id: segments_box
+        #orientation: 'horizontal'
+        size_hint: None, None
+        col: 3
+        rows: 1
+        #row_default_height: 300  # Hauteur par défaut des lignes
+        col_default_width: 10   # Largeur par défaut des colonnes
+        #row_force_default: True  # Forcer la hauteur par défaut des lignes
+        col_force_default: True  # Forcer la largeur par défaut des colonnes
+        size:  (root.segment_scale * 400)/0.2, (root.segment_scale * 30)/0.2 
         center: root.center[0] + 20, root.center[1] 
-        spacing: 0
+        spacing: 60
         padding: [0, 0, 0, 0]
