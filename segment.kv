@@ -1,0 +1,16 @@
+<Segment>:    
+    GridLayout:
+                
+        id: segments_box
+        #orientation: 'horizontal'
+        size_hint: None, None
+        col: 3
+        rows: 1
+        #row_default_height: 300  # Hauteur par défaut des lignes
+        col_default_width: 10   # Largeur par défaut des colonnes
+        #row_force_default: True  # Forcer la hauteur par défaut des lignes
+        col_force_default: True  # Forcer la largeur par défaut des colonnes
+        size:  (root.segment_scale * 400)/0.2, (root.segment_scale * 30)/0.2 
+        center: root.center[0] + 20, root.center[1] 
+        spacing: 60
+        padding: [0, 0, 0, 0]

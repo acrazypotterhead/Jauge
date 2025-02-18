@@ -60,6 +60,7 @@ class Jauge(Widget):
     # Choix de l'axe de rotation pour les valeurs de l'accéléromètre sur une jauge
     choice = StringProperty("")
     
+    show_segment = BooleanProperty(True)
 
 
     def __init__(self, **kwargs):
@@ -69,6 +70,9 @@ class Jauge(Widget):
         self.marker_startangle = kwargs.get('marker_startangle', -self.unit * 100 / 2)  
         self.needle_start_angle = kwargs.get('needle_start_angle', self.unit * 100 / 2)
         self.sensorEnabled = False
+
+
+    
 
     # Méthode de rotation de l'aiguille
     def _turn(self, *args):
@@ -93,7 +97,10 @@ class Jauge(Widget):
     def round_value(self, value):
         
         self.value = round(value, 2)  # Limiter la valeur à deux chiffres après la virgule
-        self.create_segments(self.value, self.segment_color)
+        if self.show_segment:
+            
+            self.create_segments(self.value, self.segment_color)
+        
 
 
     # Réinitialisation de la valeur maximale positive

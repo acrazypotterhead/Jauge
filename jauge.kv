@@ -35,13 +35,13 @@
             Color:
                 rgba: 255/255, 233/255, 204/255, 0.2 
                 
-            # Cercle blanc
-            Ellipse: 
-                
-                pos: (self.center_x - (min(self.size) ) / 2  , self.center_y - (min(self.size) ) / 2  )
-                size: min(self.size), min(self.size)
-                source: root.file_center
-#
+            ## Cercle blanc
+            #Ellipse: 
+            #    
+            #    pos: (self.center_x - (min(self.size) ) / 2  , self.center_y - (min(self.size) ) / 2  )
+            #    size: min(self.size), min(self.size)
+            #    source: root.file_center
+##
     
     # Importation de l'image de l'aiguille
 
@@ -126,7 +126,7 @@
 
     #Affichage de la valeur de la jauge avec des 7 segments
     GridLayout:
-        
+            
         id: segments_box
         #orientation: 'horizontal'
         size_hint: None, None
