@@ -3,11 +3,11 @@ GridLayout:
     size: root.size
     pos: root.pos
     cols: 1
-    rows: 2
-    #row_default_height: 300  # Hauteur par défaut des lignes
-    #col_default_width: 300   # Largeur par défaut des colonnes
-    #row_force_default: True  # Forcer la hauteur par défaut des lignes
-    #col_force_default: True  # Forcer la largeur par défaut des colonnes
+    rows: 3
+    row_default_height: 300  # Hauteur par défaut des lignes
+    col_default_width: 500   # Largeur par défaut des colonnes
+    row_force_default: True  # Forcer la hauteur par défaut des lignes
+    col_force_default: True  # Forcer la largeur par défaut des colonnes
 
     GridLayout:
         cols: 1
@@ -18,6 +18,7 @@ GridLayout:
             choice: "x"
             min_value: -100
             max_value: 100
+
       
 
         
@@ -57,27 +58,9 @@ GridLayout:
             value: root.ids.Jauge1.value
             on_value: root.ids.Jauge1.round_value(self.value)
 
-        #Slider:
-        #    orientation: 'horizontal'
-        #    min: root.ids.Jauge2.min_value
-        #    max: root.ids.Jauge2.max_value
-        #    step: 1
-        #    size_hint: 1,1
+    
 
-        #    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-        #    value: root.ids.Jauge2.value
-        #    on_value: root.ids.Jauge2.round_value(self.value)
 
-        #Slider:
-        #    orientation: 'horizontal'
-        #    min: root.ids.Jauge3.min_value
-        #    max: root.ids.Jauge3.max_value
-        #    step: 1
-        #    size_hint: 1,1
-        #  
-        #    pos_hint: {'center_x': 0.5, 'center_y': 0.1}
-        #    value: root.ids.Jauge3.value
-        #    on_value: root.ids.Jauge3.round_value(self.value)
     
 
 

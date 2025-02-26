@@ -11,7 +11,7 @@ from kivy.graphics import Ellipse
 class Jauge(Widget):
 
     # __Valeurs à changer__ 
-
+    size_jauge = ListProperty([300,300])  # Taille de la jauge   
     #Bornes de la jauge
     min_value = NumericProperty()
     max_value = NumericProperty()
@@ -29,16 +29,16 @@ class Jauge(Widget):
     rayon_marker = NumericProperty(1)
 
     # Importation des images
-    file_gauge = StringProperty("images/cadran 2.png")
+    file_gauge = StringProperty("images/cadran 4.png")
     file_needle = StringProperty("images/aiguille 1.png")
     #file_marker = StringProperty("images/marker.png")
-    file_background_color = StringProperty("images/fond 2.png")
+    file_background_color = StringProperty("images/fond 4.png")
     file_value_marker_positive = StringProperty("images/trait_rouge.png")
     file_value_marker_negative = StringProperty("images/trait_bleu.png")
     file_center = StringProperty("images/centre 2.png")
 
     # Taille et couleur des segments 
-    segment_color = StringProperty('112689')
+    segment_color = StringProperty('FFFFFF')
     segment_color_on_hold = StringProperty('FF0000')
     segment_scale = NumericProperty(0.3)
 
@@ -70,6 +70,7 @@ class Jauge(Widget):
         self.marker_startangle = kwargs.get('marker_startangle', -self.unit * 100 / 2)  
         self.needle_start_angle = kwargs.get('needle_start_angle', self.unit * 100 / 2)
         self.sensorEnabled = False
+        
 
 
     

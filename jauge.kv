@@ -2,7 +2,7 @@
         
     size_hint: None, None
 
-
+    size: root.size_jauge
 
     #Importation de l'image de la jauge
     Image:
@@ -35,13 +35,6 @@
             Color:
                 rgba: 255/255, 233/255, 204/255, 0.2 
                 
-            ## Cercle blanc
-            #Ellipse: 
-            #    
-            #    pos: (self.center_x - (min(self.size) ) / 2  , self.center_y - (min(self.size) ) / 2  )
-            #    size: min(self.size), min(self.size)
-            #    source: root.file_center
-##
     
     # Importation de l'image de l'aiguille
 
@@ -100,6 +93,13 @@
         pos: (root.pos[0] + root.width - self.width, root.pos[1])
         color: 1, 0, 0, 1
         font_size: 20
+        canvas.before: 
+            Color:
+                rgba: 1, 1, 0, 1
+            RoundedRectangle:
+                pos: self.pos[0], self.pos[1]
+                size: 100, 50
+                radius: [10, 10, 10, 10]
 
     # Affichage de la valeur negative max de la jauge
     Label:
@@ -137,6 +137,6 @@
         #row_force_default: True  # Forcer la hauteur par défaut des lignes
         col_force_default: True  # Forcer la largeur par défaut des colonnes
         size:  (root.segment_scale * 400)/0.2, (root.segment_scale * 30)/0.2 
-        center: root.center[0] + 20, root.center[1] 
+        center: root.center[0]+200 , root.center[1] 
         spacing: 60
         padding: [0, 0, 0, 0]

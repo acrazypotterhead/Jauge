@@ -9,12 +9,12 @@ from kivy.core.window import Window
 Builder.load_file('jauge.kv')
 
 # changement de la couleur de fond de l'application
-Window.clearcolor = (255/255, 233/255, 204/255)
+Window.clearcolor = (19/255, 35/255, 85/255)
 
 # appel de l'interface principale
 class MyApp(App):
     def build(self):
         return Builder.load_file('interface.kv')
-    
+
 if __name__ == '__main__':
     MyApp().run()
