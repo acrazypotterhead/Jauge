@@ -29,7 +29,7 @@ class Jauge(Widget):
     rayon_marker = NumericProperty(1)
 
     # Importation des images
-    file_gauge = StringProperty("images/cadran 4.png")
+    file_gauge = StringProperty("images/cadran 5.png")
     file_needle = StringProperty("images/aiguille 1.png")
     #file_marker = StringProperty("images/marker.png")
     file_background_color = StringProperty("images/fond 4.png")
